@@ -1,0 +1,106 @@
+#!/bin/bash
+#########################################################################################
+#                                                                                       #
+#                                                                                       #
+#                 Setup firewalld for public servers in the DMZ                         #
+#                                                                                       #
+#                                                                                       #
+#########################################################################################
+
+#########################################################################################
+#
+# variables
+#
+#########################################################################################
+#
+# newzone = new firewall zone we are configuring
+newzone="publicweb"
+#
+# interface = network interface to associate with the new zone
+interface="enp0s3"
+#
+# allservices = services exposed to all IPs/Networks (cannot be empty)
+allservices="http https tomcat-http tomcat-https mysql"
+#
+# mgmtservices = services exposed to the management LAN and firewall only (should contain
+# ssh at least)
+mgmtservices="ssh cockpit"
+#
+# mgmtlan = network used to manage this instance
+mgmtlan="10.10.10.0/24"
+#
+# firewallip = IP address of firewall (to allow management access)
+firewallip="10.10.20.1"
+#
+#########################################################################################
+
+#########################################################################################
+# Create New Services (not available by default)
+#########################################################################################
+
+# Tomcat (http) on port 8080
+
+sudo firewall-cmd --permanent --new-service=tomcat-http
+
+sudo firewall-cmd --permanent --service=tomcat-http --set-description="Tomcat server on port 8080"
+sudo firewall-cmd --permanent --service=tomcat-http --set-short=tomcat-http
+sudo firewall-cmd --permanent --service=tomcat-http --add-port=8080/tcp
+
+# Secure Tomcat (https) on port 8443
+
+sudo firewall-cmd --permanent --new-service=tomcat-http
+
+sudo firewall-cmd --permanent --service=tomcat-http --set-description="Tomcat server on port 8443"
+sudo firewall-cmd --permanent --service=tomcat-http --set-short=tomcat-https
+sudo firewall-cmd --permanent --service=tomcat-http --add-port=8443/tcp
+
+#########################################################################################
+
+
+#########################################################################################
+# Setup new zone
+#########################################################################################
+
+# Create new zone
+echo "Creating new zone ${newzone}."
+sudo firewall-cmd --permanent --new-zone="${newzone}"
+
+#########################################################################################
+# Add services to zone
+#########################################################################################
+# Normal services available to all
+
+for service in ${allservices}
+do
+  echo "Adding ${service} to ${newzone}."
+  sudo firewall-cmd --permanent --zone="${newzone}" --add-service=${service}
+done
+
+#########################################################################################
+# Management services to allow the Management LAN and firewall to manage this instance
+
+for service in ${mgmtservices}
+do
+  echo "Adding $service to ${newzone} for ${mgmtlan}."
+  sudo firewall-cmd --permanent --zone="${newzone}" --add-rich-rule 'rule family="ipv4" \
+    service name="${service}" source address="${mgmtlan}" accept'
+  echo "Adding $service to ${newzone} for ${firewallip}."
+  sudo firewall-cmd --permanent --zone="${newzone}" --add-rich-rule 'rule family="ipv4" \
+    service name="${service}" source address="${firewallip}" accept'
+done
+
+#########################################################################################
+# Assign zone to network device
+echo "Asigning ${interface} to ${newzone}."
+sudo firewall-cmd --permanent --zone="${newzone}" --change-interface="${interface}"
+
+#########################################################################################
+# Make new zone the default
+echo "Making ${newzone} the default zone."
+sudo firewall-cmd --permanent --set-default-zone="${newzone}"
+
+#########################################################################################
+# Make permanent configuration active
+firewall-cmd --reload
+
+
