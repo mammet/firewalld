@@ -1,0 +1,72 @@
+#!/bin/bash
+#########################################################################################
+#                                                                                       #
+#                                                                                       #
+#                 Setup firewalld for public servers in the DMZ                         #
+#                                                                                       #
+#                                                                                       #
+#########################################################################################
+
+
+#########################################################################################
+#
+# Setup new zone
+#
+#########################################################################################
+
+# Create new zone
+sudo firewall-cmd --permanent --new-zone=publicweb
+
+#########################################################################################
+# Add services to zone
+#########################################################################################
+
+# Add services available to all IPs/Networks
+
+# http(s)
+sudo firewall-cmd --permanent --zone=publicweb --add-service=http
+sudo firewall-cmd --permanent --zone=publicweb --add-service=https
+
+# Tomcat (no predefined service available, must use port.)
+sudo firewall-cmd --permanent --zone=publicweb --add-port=8080/tcp
+sudo firewall-cmd --permanent --zone=publicweb --add-port=8443/tcp
+
+#########################################################################################
+# Add Specific rich rules to allow the Management LAN to manage this instance
+#########################################################################################
+
+# Allow ssh from management LAN or firewall
+sudo firewall-cmd --permanent --zone=publicweb --add-rich-rule 'rule family="ipv4" service name="ssh" source address="10.10.10.0/24" accept'
+sudo firewall-cmd --permanent --zone=publicweb --add-rich-rule 'rule family="ipv4" service name="ssh" source address="10.10.20.1" accept'
+
+# Allow Cockpit from management LAN or firewall
+sudo firewall-cmd --permanent --zone=publicweb --add-rich-rule 'rule family="ipv4" service name="cockpit" source address="10.10.10.0/24" accept'
+sudo firewall-cmd --permanent --zone=publicweb --add-rich-rule 'rule family="ipv4" service name="coclpit" source address="10.10.20.1" accept'
+
+
+#########################################################################################
+# Assign zone to network device
+#########################################################################################
+sudo firewall-cmd --permanent --zone=publicweb --change-interface=enp0s3
+
+#########################################################################################
+# Make new zone the default
+#########################################################################################
+sudo firewall-cmd --permanent --set-default-zone=publicweb
+
+#########################################################################################
+# Make permanent configuration active
+#########################################################################################
+sudo firewall-cmd --reload
+
+
+
+
+
+
+
+
+
+
+
+

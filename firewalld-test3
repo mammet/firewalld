@@ -1,0 +1,100 @@
+#!/bin/bash
+#########################################################################################
+#                                                                                       #
+#                                                                                       #
+#                 Setup firewalld for public servers in the DMZ                         #
+#                                                                                       #
+#    This script creates a new firewald zone and adds rules to that zone to allow       # 
+#    Network access.  The first set of rules below allow "generic" access to any        #
+#    IP address.  The rich rules below that allow "special" access to management        #
+#    ports, but only for the management LAN or the firewall.                            #
+#                                                                                       #
+#    All of the changes are made to the runtime configuration.  If something fails      #
+#    the host can be rebooted and it will return to the old firewall rules.  Onlt       #
+#    at the end of the script are the changes made permanent.                           #
+#                                                                                       #
+#########################################################################################
+
+#########################################################################################
+# Variables
+newzone="publicweb"
+interface="enp0s3"
+
+#########################################################################################
+
+#########################################################################################
+#
+# Setup new zone
+#
+#########################################################################################
+
+#########################################################################################
+# Create new zone
+sudo firewall-cmd --new-zone=${newzone}
+#########################################################################################
+
+#########################################################################################
+#
+# Add services to zone
+#
+#########################################################################################
+
+#########################################################################################
+# Add "generic" services available to all IPs/Networks
+#########################################################################################
+
+# http(s)
+sudo firewall-cmd --zone=${newzone} --add-service=http
+sudo firewall-cmd --zone=${newzone} --add-service=https
+
+# Tomcat (no predefined service available, must use port.)
+sudo firewall-cmd --zone=${newzone} --add-port=8080/tcp
+sudo firewall-cmd --zone=${newzone} --add-port=8443/tcp
+
+#########################################################################################
+# Add "special" rich rules to allow the Management LAN to manage this instance
+#########################################################################################
+
+# Allow ssh from management LAN or firewall
+sudo firewall-cmd --zone=${newzone} --add-rich-rule 'rule family="ipv4" service name="ssh" source address="10.10.10.0/24" accept'
+sudo firewall-cmd --zone=${newzone} --add-rich-rule 'rule family="ipv4" service name="ssh" source address="10.10.20.1" accept'
+
+# Allow Cockpit from management LAN or firewall
+sudo firewall-cmd --zone=${newzone} --add-rich-rule 'rule family="ipv4" service name="cockpit" source address="10.10.10.0/24" accept'
+sudo firewall-cmd --zone=${newzone} --add-rich-rule 'rule family="ipv4" service name="coclpit" source address="10.10.20.1" accept'
+
+#########################################################################################
+
+#########################################################################################
+#
+# Finish configuring the zone
+#
+#########################################################################################
+
+#########################################################################################
+# Assign zone to network device
+#########################################################################################
+sudo firewall-cmd --zone=${newzone} --change-interface=${interface}
+
+#########################################################################################
+# Make new zone the default
+#########################################################################################
+sudo firewall-cmd --set-default-zone=${newzone}
+
+#########################################################################################
+# Make permanent configuration active
+#########################################################################################
+sudo firewall-cmd --runtime-to-permanent
+sudo firewall-cmd --reload
+
+
+
+
+
+
+
+
+
+
+
+
