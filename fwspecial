@@ -1,0 +1,28 @@
+firewall-cmd --permanent --zone=dmz --add-rich-rule=' \
+  rule family="ipv4" \
+  source address="10.10.10.0/24" \
+  port protocol="tcp" port="22" accept'
+
+
+sudo firewall-cmd --add-rich-rule 'rule family="ipv4" service name="ssh" source address="10.10.1.125" accept'
+sudo firewall-cmd --add-rich-rule 'rule family="ipv4" service name="https" source address="10.10.1.125" accept'
+sudo firewall-cmd --add-rich-rule 'rule family="ipv4" service name="ssh" source address="10.10.1.126" accept'
+sudo firewall-cmd --add-rich-rule 'rule family="ipv4" service name="https" source address="10.10.1.126" accept'
+firewall-cmd --reload
+
+
+
+
+########################################
+# NOT WORKING
+########################################
+# sudo firewall-cmd --add-rich-rule 'rule family="ipv4" source address="10.10.1.0/24" drop'
+
+# sudo firewall-cmd --add-rich-rule 'rule family="ipv4" source address="10.10.1.125" accept'
+
+# sudo firewall-cmd --add-rich-rule 'rule family="ipv4" source address="10.10.1.126" accept'
+
+
+# My try
+
+sudo firewall-cmd --permanent --zone=dmz --add-rich-rule 'rule family="ipv4" service name="ssh" source address="10.10.10.0/24" accept'
