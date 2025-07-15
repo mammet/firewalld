@@ -10,7 +10,7 @@
 #    ports, but only for the management LAN or the firewall.                            #
 #                                                                                       #
 #    All of the changes are made to the runtime configuration.  If something fails      #
-#    the host can be rebooted and it will return to the old firewall rules.  Onlt       #
+#    the host can be rebooted and it will return to the old firewall rules.  Only       #
 #    at the end of the script are the changes made permanent.                           #
 #                                                                                       #
 #########################################################################################
