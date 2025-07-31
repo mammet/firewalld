@@ -1,0 +1,38 @@
+This is a firewall script for a dual-homed server.
+The server has one interface on the "public" LAN network.
+It also has another interface on the "private" management LAN network.
+
+PUBLIC_LAN=10.10.10.0/24
+PUBLIC_NIC=enp0s8
+
+ROUTER=10.10.10.1
+
+PRIVATE_LAN=192.168.100.0/24
+PRIVATE_NIC=enp0s3
+
+JUMPHOST=192.168.100.10
+TIMESERVER=10.10.10.20
+LOGSERVER=10.10.10.30
+DNS=10.10.10.40
+
+inbound {
+    Allow all on loopback net
+    Allow all established,related
+    Deny all invalid
+    Allow tcp new on $PUBLIC_NIC to http,https
+    Allow tcp new on $PRIVATE_NIC to ssh from $JUMPHOST
+    Allow ICMP on $PUBLIC_NIC from $ROUTER
+    Allow ICMP on $PRIVATE_NIC from $PRIVATE_LAN
+    Deny all
+}
+
+outbound {
+    Allow all on loopback net
+    Allow all established,related
+    Allow udp new on $PUBLIC_NIC to dns on $DNS
+    Allow udp new on $PUBLIC_NIC to ntp on $TIMESERVER
+    Allow tcp new on $PUBLIC_NIC to syslog on $LOGSERVER
+    Allow ICMP on $PUBLIC_NIC from $ROUTER
+    Allow ICMP on $PRIVATE_NIC from $PRIVATE_LAN
+    Deny all
+}
