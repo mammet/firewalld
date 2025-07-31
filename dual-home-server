@@ -1,4 +1,4 @@
-This is a firewall script for a dual-homed server.
+This is pseudocode for a firewall script for a dual-homed server.
 The server has one interface on the "public" LAN network.
 It also has another interface on the "private" management LAN network.
 
