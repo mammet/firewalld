@@ -1,1 +1,2 @@
-These are some scripts for configuring firewalld.
+These are some scripts for configuring firewalld and NFTables.
+
