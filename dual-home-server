@@ -15,24 +15,55 @@ TIMESERVER=10.10.10.20
 LOGSERVER=10.10.10.30
 DNS=10.10.10.40
 
+WEB=http,https
+
+# Port assigned to the ssh service
+SSH=22
+
 inbound {
     Allow all on loopback net
     Allow all established,related
-    Deny all invalid
-    Allow tcp new on $PUBLIC_NIC to http,https
-    Allow tcp new on $PRIVATE_NIC to ssh from $JUMPHOST
-    Allow ICMP on $PUBLIC_NIC from $ROUTER
-    Allow ICMP on $PRIVATE_NIC from $PRIVATE_LAN
-    Deny all
+    Deny  all invalid
+    Jump  all on $PUBLIC_NIC  to public_inbound
+    Jump  all on $PRIVATE_NIC to private_inbound
+    Deny  all
 }
 
 outbound {
+    Allow all on loopback net
+    Allow all established,related
+    Jump  all on $PUBLIC_NIC  to public_outbound
+    Jump  all on $PRIVATE_NIC to private_outbound
+    Deny all
+}
+
+public_inbound (
+    Allow tcp new on $PUBLIC_NIC to $WEB
+    Allow ICMP on $PUBLIC_NIC from $ROUTER
+    Deny  all
+}
+
+private_inbound (
+    Allow tcp new on $PRIVATE_NIC to $SSH from $JUMPHOST
+    Allow ICMP on $PRIVATE_NIC from $PRIVATE_LAN
+    Deny  all
+}
+
+public_outbound {
     Allow all on loopback net
     Allow all established,related
     Allow udp new on $PUBLIC_NIC to dns on $DNS
     Allow udp new on $PUBLIC_NIC to ntp on $TIMESERVER
     Allow tcp new on $PUBLIC_NIC to syslog on $LOGSERVER
     Allow ICMP on $PUBLIC_NIC from $ROUTER
+    Deny all
+}
+
+private_outbound {
+    Allow all on loopback net
+    Allow all established,related
     Allow ICMP on $PRIVATE_NIC from $PRIVATE_LAN
     Deny all
 }
+
+
