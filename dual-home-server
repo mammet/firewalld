@@ -5,10 +5,10 @@ It also has another interface on the "private" management LAN network.
 PUBLIC_LAN=10.10.10.0/24
 PUBLIC_NIC=enp0s8
 
-ROUTER=10.10.10.1
-
 PRIVATE_LAN=192.168.100.0/24
 PRIVATE_NIC=enp0s3
+
+ROUTER=10.10.10.1
 
 JUMPHOST=192.168.100.10
 TIMESERVER=10.10.10.20
