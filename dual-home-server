@@ -1,11 +1,11 @@
 This is firewall script pseudocode for a dual-homed server.
-The server has one interface on the "public" LAN network.
-It also has another interface on the "private" management LAN network.
+The server has one interface on the "public" network.
+It also has another interface on the "private" management network.
 
-PUBLIC_LAN=10.10.10.0/24
+PUBLIC_NET=10.10.10.0/24
 PUBLIC_NIC=enp0s8
 
-PRIVATE_LAN=192.168.100.0/24
+PRIVATE_NET=192.168.100.0/24
 PRIVATE_NIC=enp0s3
 
 ROUTER=10.10.10.1
@@ -45,7 +45,7 @@ public_inbound (
 
 private_inbound (
     Allow tcp new on $PRIVATE_NIC to $SSH from $JUMPHOST
-    Allow ICMP on $PRIVATE_NIC from $PRIVATE_LAN
+    Allow ICMP on $PRIVATE_NIC from $PRIVATE_NET
     Deny  all
 }
 
@@ -62,7 +62,7 @@ public_outbound {
 private_outbound {
     Allow all on loopback net
     Allow all established,related
-    Allow ICMP on $PRIVATE_NIC from $PRIVATE_LAN
+    Allow ICMP on $PRIVATE_NIC from $PRIVATE_NET
     Deny all
 }
 
