@@ -25,46 +25,46 @@ SSH=22
 ###################
 
 
-inbound {
+in {
     Allow all on loopback net
     Allow all established,related
     Deny  all invalid
-    Jump  all on $PUBLIC_NIC  to public_inbound
-    Jump  all on $PRIVATE_NIC to private_inbound
+    Jump  all on $PUBLIC_NIC  to public_in
+    Jump  all on $PRIVATE_NIC to private_in
     Deny  all
 }
 
-outbound {
+out {
     Allow all on loopback net
     Allow all established,related
-    Jump  all on $PUBLIC_NIC  to public_outbound
-    Jump  all on $PRIVATE_NIC to private_outbound
+    Jump  all on $PUBLIC_NIC  to public_out
+    Jump  all on $PRIVATE_NIC to private_out
     Deny all
 }
 
-public_inbound (
+public_in (
     Allow tcp new on $PUBLIC_NIC to $WEB
     Allow ICMP on $PUBLIC_NIC from $ROUTER
     Deny  all
 }
 
-private_inbound (
+private_in (
     Allow tcp new on $PRIVATE_NIC to $SSH from $JUMPHOST
     Allow ICMP on $PRIVATE_NIC from $PRIVATE_NET
     Deny  all
 }
 
-public_outbound {
+public_out {
     Allow all on loopback net
     Allow all established,related
     Allow udp new on $PUBLIC_NIC to dns on $DNS
     Allow udp new on $PUBLIC_NIC to ntp on $TIMESERVER
     Allow tcp new on $PUBLIC_NIC to syslog on $LOGSERVER
-    Allow ICMP on $PUBLIC_NIC from $ROUTER
+    Allow ICMP on $PUBLIC_NIC to $ROUTER
     Deny all
 }
 
-private_outbound {
+private_out {
     Allow all on loopback net
     Allow all established,related
     Allow ICMP on $PRIVATE_NIC from $PRIVATE_NET
