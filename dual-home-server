@@ -17,13 +17,15 @@ TIMESERVER=10.10.10.20
 LOGSERVER=10.10.10.30
 DNS=10.10.10.40
 
-WEB=http,https
+# Port assigned to http(s) service
+HTTP=80
+HTTPS=443
+WEB=$HTTP,$HTTPS
 
 # Port assigned to the ssh service
 SSH=22
 
 ###################
-
 
 in {
     Allow all on loopback net
