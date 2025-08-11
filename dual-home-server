@@ -1,6 +1,8 @@
 This is firewall script pseudocode for a dual-homed server.
 The server has one interface on the "public" network.
-It also has another interface on the "private" management network.
+It also has another interface on the "private", management network.
+
+#### Variables ####
 
 PUBLIC_NET=10.10.10.0/24
 PUBLIC_NIC=enp0s8
@@ -19,6 +21,9 @@ WEB=http,https
 
 # Port assigned to the ssh service
 SSH=22
+
+###################
+
 
 inbound {
     Allow all on loopback net
